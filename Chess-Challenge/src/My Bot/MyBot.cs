@@ -40,16 +40,16 @@ public class MyBot : IChessBot
             {-10,  5,  0,  0,  0,  0,  5,-10},
             {-20,-10,-10,-10,-10,-10,-10,-20}
         },
-        //{ // 3 rook
-        //    { 0,  0,  0,  0,  0,  0,  0,  0},
-        //    { 5, 10, 10, 10, 10, 10, 10,  5},
-        //    {-5,  0,  0,  0,  0,  0,  0, -5},
-        //    {-5,  0,  0,  0,  0,  0,  0, -5},
-        //    {-5,  0,  0,  0,  0,  0,  0, -5},
-        //    {-5,  0,  0,  0,  0,  0,  0, -5},
-        //    {-5,  0,  0,  0,  0,  0,  0, -5},
-        //    { 0,  0,  0,  5,  5,  0,  0,  0}
-        //},
+        { // 3 rook
+            { 0,  0,  0,  0,  0,  0,  0,  0},
+            { 5, 10, 10, 10, 10, 10, 10,  5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            { 0,  0,  0,  5,  5,  0,  0,  0}
+        },
         { // 4 queen
             {-20,-10,-10, -5, -5,-10,-10,-20},
             {-10,  0,  0,  0,  0,  0,  0,-10},
@@ -144,7 +144,7 @@ public class MyBot : IChessBot
         return alpha;
     }
 
-    // Main method for evaluating the "score" of a position. Currently just material evaluation
+    // Main method for evaluating the "score" of a position.
     int Evalute(Board board)
     {
         PieceList[] arrayOfPieceLists = board.GetAllPieceLists();
