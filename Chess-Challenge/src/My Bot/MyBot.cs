@@ -7,17 +7,83 @@ public class MyBot : IChessBot
     // Documentation
 
     // Piece values: pawn, knight, bishop, rook, queen, king
-    int[] pieceValues = { 100, 300, 320, 500, 900, 10000 };
-    int[,] pawnBlackPositionValues = 
-        { 
-            { 100, 100, 103, 105, 105, 103, 100, 100 },
-            { 20,20,23,25,25,23,20,20 },
-            { 13,13,16,18,18,16,13,13 },
-            { 12,12,15,17,17,15,12,12 },
-            { 11,11,14,16,16,14,11,11 },
-            { 10,10,13,15,15,13,10,10 },
-            { 0,0,0,0,0,0,0,0 },
-            { 0,0,0,0,0,0,0,0 },
+    int[] pieceValues = { 100, 320, 350, 500, 900, 10000 };
+    int[,] pawnBlackPositionValues =
+        {
+            { 0,  0,  0,  0,  0,  0,  0,  0 },
+            {50, 50, 50, 50, 50, 50, 50, 50 },
+            {20, 20, 20, 30, 30, 20, 20, 20 },
+            { 5,  5, 10, 25, 25, 10,  5,  5 },
+            { 0,  0,  0, 20, 20,  0,  0,  0 },
+            { 5, -5,-10,  0,  0,-10, -5,  5 },
+            { 5, 10, 10,-20,-20, 10, 10,  5 },
+            { 0,  0,  0,  0,  0,  0,  0,  0 }
+        };
+    int[,] knightBlackPositionValues =
+        {
+            {-50,-40,-30,-30,-30,-30,-40,-50},
+            {-40,-20,  0,  0,  0,  0,-20,-40},
+            {-30,  0, 10, 15, 15, 10,  0,-30},
+            {-30,  5, 15, 15, 15, 15,  5,-30},
+            {-30,  0, 15, 15, 15, 15,  0,-30},
+            {-30,  5, 10, 15, 15, 10,  5,-30},
+            {-40,-20,  0,  5,  5,  0,-20,-40},
+            {-50,-40,-30,-30,-30,-30,-40,-50}
+        };
+    int[,] bishopBlackPositionValues =
+        {
+            {-20,-10,-10,-10,-10,-10,-10,-20},
+            {-10,  0,  0,  0,  0,  0,  0,-10},
+            {-10,  0,  5, 10, 10,  5,  0,-10},
+            {-10,  5,  5, 10, 10,  5,  5,-10},
+            {-10,  0, 10, 10, 10, 10,  0,-10},
+            {-10, 10, 10, 10, 10, 10, 10,-10},
+            {-10,  5,  0,  0,  0,  0,  5,-10},
+            {-20,-10,-10,-10,-10,-10,-10,-20}
+        };
+    int[,] rookBlackPositionValues =
+        {
+            { 0,  0,  0,  0,  0,  0,  0,  0},
+            { 5, 10, 10, 10, 10, 10, 10,  5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            {-5,  0,  0,  0,  0,  0,  0, -5},
+            { 0,  0,  0,  5,  5,  0,  0,  0}
+        };
+    int[,] queenBlackPositionValues =
+        {
+            {-20,-10,-10, -5, -5,-10,-10,-20},
+            {-10,  0,  0,  0,  0,  0,  0,-10},
+            {-10,  0,  5,  5,  5,  5,  0,-10},
+            { -5,  0,  5,  5,  5,  5,  0, -5},
+            {  0,  0,  5,  5,  5,  5,  0, -5},
+            {-10,  5,  5,  5,  5,  5,  0,-10},
+            {-10,  0,  5,  0,  0,  0,  0,-10},
+            {-20,-10,-10, -5, -5,-10,-10,-20}
+        };
+    int[,] kingMidBlackPositionValues =
+        {
+            {-30,-40,-40,-50,-50,-40,-40,-30},
+            {-30,-40,-40,-50,-50,-40,-40,-30},
+            {-30,-40,-40,-50,-50,-40,-40,-30},
+            {-30,-40,-40,-50,-50,-40,-40,-30},
+            {-20,-30,-30,-40,-40,-30,-30,-20},
+            {-10,-20,-20,-20,-20,-20,-20,-10},
+            { 20, 20,  0,  0,  0,  0, 20, 20},
+            { 20, 30, 10,  0,  0, 10, 30, 20}
+        };
+    int[,] kingEndBlackPositionValues =
+        {
+            {-50,-40,-30,-20,-20,-30,-40,-50},
+            {-30,-20,-10,  0,  0,-10,-20,-30},
+            {-30,-10, 20, 30, 30, 20,-10,-30},
+            {-30,-10, 30, 40, 40, 30,-10,-30},
+            {-30,-10, 30, 40, 40, 30,-10,-30},
+            {-30,-10, 20, 30, 30, 20,-10,-30},
+            {-30,-30,  0,  0,  0,  0,-30,-30},
+            {-50,-30,-30,-30,-30,-30,-30,-50}
         };
     public MyBot() {
         //Random random = new Random();
@@ -120,13 +186,80 @@ public class MyBot : IChessBot
     int GetAllPiecesPositionValue(PieceList[] pieceLists)
     {
         int total = 0;
-        foreach (Piece piece in pieceLists[0]) // Add points for my good positions
+        // Pawn
+        foreach (Piece piece in pieceLists[0]) // Add points for white's good positions
         {
             total += pawnBlackPositionValues[7 - piece.Square.File, piece.Square.Rank]; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
         }
-        foreach (Piece piece in pieceLists[6]) // Subtract points for opponent's good positions
+        foreach (Piece piece in pieceLists[6]) // Subtract points for black's good positions
         {
             total += pawnBlackPositionValues[piece.Square.File, piece.Square.Rank] * -1; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+
+        // Knight
+        foreach (Piece piece in pieceLists[1]) // Add points for white's good positions
+        {
+            total += knightBlackPositionValues[7 - piece.Square.File, piece.Square.Rank]; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+        foreach (Piece piece in pieceLists[7]) // Subtract points for black's good positions
+        {
+            total += knightBlackPositionValues[piece.Square.File, piece.Square.Rank] * -1; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+
+        // Bishop
+        foreach (Piece piece in pieceLists[2]) // Add points for white's good positions
+        {
+            total += bishopBlackPositionValues[7 - piece.Square.File, piece.Square.Rank]; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+        foreach (Piece piece in pieceLists[8]) // Subtract points for black's good positions
+        {
+            total += bishopBlackPositionValues[piece.Square.File, piece.Square.Rank] * -1; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+
+        // Rook
+        foreach (Piece piece in pieceLists[3]) // Add points for white's good positions
+        {
+            total += rookBlackPositionValues[7 - piece.Square.File, piece.Square.Rank]; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+        foreach (Piece piece in pieceLists[9]) // Subtract points for black's good positions
+        {
+            total += rookBlackPositionValues[piece.Square.File, piece.Square.Rank] * -1; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+
+        // Queen
+        foreach (Piece piece in pieceLists[4]) // Add points for white's good positions
+        {
+            total += queenBlackPositionValues[7 - piece.Square.File, piece.Square.Rank]; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+        foreach (Piece piece in pieceLists[10]) // Subtract points for black's good positions
+        {
+            total += queenBlackPositionValues[piece.Square.File, piece.Square.Rank] * -1; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+        }
+
+        // King
+        int minorPieceCount = pieceLists[1].Count + pieceLists[2].Count + pieceLists[3].Count;
+        if ((pieceLists[4].Count == 0 && pieceLists[10].Count == 0 && minorPieceCount <= 4) || (minorPieceCount <= 2)) 
+        // Queens are off the board or two or fewer knight/bishop/rook, we're endgame now. Technically we could check black's pieces too but if the two players are mismatched by an entire minor piece, the game is probably over
+        {
+            foreach (Piece piece in pieceLists[5]) // Add points for white's good positions
+            {
+                total += kingEndBlackPositionValues[7 - piece.Square.File, piece.Square.Rank]; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+            }
+            foreach (Piece piece in pieceLists[11]) // Subtract points for black's good positions
+            {
+                total += kingEndBlackPositionValues[piece.Square.File, piece.Square.Rank] * -1; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+            }
+        }
+        else
+        {
+            foreach (Piece piece in pieceLists[5]) // Add points for white's good positions
+            {
+                total += kingMidBlackPositionValues[7 - piece.Square.File, piece.Square.Rank]; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+            }
+            foreach (Piece piece in pieceLists[11]) // Subtract points for black's good positions
+            {
+                total += kingMidBlackPositionValues[piece.Square.File, piece.Square.Rank] * -1; // Row, Column (currently assumes position values are symmetrical because it simplifies our calculation)
+            }
         }
         return total;
     }
