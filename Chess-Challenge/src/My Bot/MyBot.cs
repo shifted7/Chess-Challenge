@@ -196,7 +196,7 @@ public class MyBot : IChessBot
     }
 
     // Main method for evaluating the "score" of a position.
-    int Evaluate(Board board)
+    public int Evaluate(Board board)
     {
         PieceList[] arrayOfPieceLists = board.GetAllPieceLists();
         int positionEvaluation = GetAllPiecesPositionValue(arrayOfPieceLists);
@@ -228,7 +228,7 @@ public class MyBot : IChessBot
     }
     */
 
-    int GetAllPiecesPositionValue(PieceList[] pieceLists)
+    public int GetAllPiecesPositionValue(PieceList[] pieceLists)
     {
         int total = 0;
         bool whitePieces = true;

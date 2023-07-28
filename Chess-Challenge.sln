@@ -10,7 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatGptOneLiner", "ChatGptOneLiner\ChatGptOneLiner.csproj", "{3D49C9B9-13A4-488F-8BB1-237271AAD69C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatGptOneLiner", "ChatGptOneLiner\ChatGptOneLiner.csproj", "{3D49C9B9-13A4-488F-8BB1-237271AAD69C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chess-Challenge-Tests", "Chess-Challenge-Tests\Chess-Challenge-Tests.csproj", "{FBC2BA9A-CAF1-4413-8FAE-6C761A562304}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,10 @@ Global
 		{3D49C9B9-13A4-488F-8BB1-237271AAD69C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D49C9B9-13A4-488F-8BB1-237271AAD69C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D49C9B9-13A4-488F-8BB1-237271AAD69C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBC2BA9A-CAF1-4413-8FAE-6C761A562304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBC2BA9A-CAF1-4413-8FAE-6C761A562304}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBC2BA9A-CAF1-4413-8FAE-6C761A562304}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBC2BA9A-CAF1-4413-8FAE-6C761A562304}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
