@@ -7,78 +7,78 @@ public class MyBot : IChessBot
     // Documentation
 
     // Piece values: pawn, knight, bishop, rook, queen, king
-    int[] pieceValues = { 100, 320, 350, 500, 900, 10000 };
+    // int[] pieceValues = { 100, 320, 350, 500, 900, 10000 };
     int[,,] allPiecesBlackPositionValues =
     {
-        { // 0 pawn
-            { 0,  0,  0,  0,  0,  0,  0,  0 },
-            {50, 50, 50, 50, 50, 50, 50, 50 },
-            {20, 20, 20, 30, 30, 20, 20, 20 },
-            { 5,  5, 10, 25, 25, 10,  5,  5 },
-            { 0,  0,  0, 20, 20,  0,  0,  0 },
-            { 5, -5,-10,  0,  0,-10, -5,  5 },
-            { 5, 10, 10,-20,-20, 10, 10,  5 },
-            { 0,  0,  0,  0,  0,  0,  0,  0 }
+        { // 0 pawn (100)
+            {  0,   0,   0,   0,   0,   0,   0,   0}, //h1 to a1 when calculated for white
+            {180, 180, 180, 180, 180, 180, 180, 180},
+            {130, 135, 140, 145, 145, 140, 135, 130},
+            {105, 105, 110, 125, 125, 110, 105, 105},
+            {100, 100, 110, 120, 120, 100, 100, 100},
+            {105, 105,  95, 100, 100, 100, 105, 105}, // intentionally asymmetric - discourages f6/f3
+            {105, 110, 110,  80,  80, 110, 110, 105},
+            {  0,   0,   0,   0,   0,   0,   0,   0} // h8 to a8 when calculated for white
         },
-        { // 1 knight
-            {-50,-40,-30,-30,-30,-30,-40,-50},
-            {-40,-20,  0,  0,  0,  0,-20,-40},
-            {-30,  0, 10, 15, 15, 10,  0,-30},
-            {-30,  5, 15, 15, 15, 15,  5,-30},
-            {-30,  0, 15, 15, 15, 15,  0,-30},
-            {-30,  5, 10, 15, 15, 10,  5,-30},
-            {-40,-20,  0,  5,  5,  0,-20,-40},
-            {-50,-40,-30,-30,-30,-30,-40,-50}
+        { // 1 knight (320)
+            {290, 300, 305, 305, 305, 305, 300, 290},
+            {300, 310, 320, 320, 320, 320, 310, 300},
+            {305, 310, 331, 333, 333, 331, 310, 305},
+            {305, 320, 335, 335, 335, 335, 320, 305},
+            {305, 320, 335, 335, 335, 335, 320, 305},
+            {305, 315, 330, 335, 335, 330, 335, 305},
+            {300, 310, 320, 325, 325, 320, 310, 305},
+            {290, 300, 305, 305, 305, 305, 300, 290}
         },
-        { // 2 bishiop
-            {-20,-10,-10,-10,-10,-10,-10,-20},
-            {-10,  0,  0,  0,  0,  0,  0,-10},
-            {-10,  0,  5, 10, 10,  5,  0,-10},
-            {-10,  5,  5, 10, 10,  5,  5,-10},
-            {-10,  0, 10, 10, 10, 10,  0,-10},
-            {-10, 10, 10, 10, 10, 10, 10,-10},
-            {-10,  5,  0,  0,  0,  0,  5,-10},
-            {-20,-10,-10,-10,-10,-10,-10,-20}
+        { // 2 bishiop (350)
+            {330, 340, 340, 340, 340, 340, 340, 330},
+            {340, 350, 350, 350, 350, 350, 350, 340},
+            {340, 350, 355, 355, 355, 355, 350, 340},
+            {340, 355, 355, 360, 360, 355, 355, 340},
+            {340, 350, 360, 360, 360, 360, 350, 340},
+            {340, 360, 360, 360, 360, 360, 360, 340},
+            {340, 360, 350, 350, 350, 350, 360, 340},
+            {330, 340, 340, 340, 340, 340, 340, 330}
         },
-        { // 3 rook
-            { 0,  0,  0,  0,  0,  0,  0,  0},
-            { 5, 10, 10, 10, 10, 10, 10,  5},
-            {-5,  0,  0,  0,  0,  0,  0, -5},
-            {-5,  0,  0,  0,  0,  0,  0, -5},
-            {-5,  0,  0,  0,  0,  0,  0, -5},
-            {-5,  0,  0,  0,  0,  0,  0, -5},
-            {-5,  0,  0,  0,  0,  0,  0, -5},
-            { 0,  0,  0,  5,  5,  0,  0,  0}
+        { // 3 rook (500)
+            {500, 500, 500, 500, 500, 500, 500, 500},
+            {505, 510, 510, 510, 510, 510, 510, 505},
+            {495, 500, 500, 500, 500, 500, 500, 495},
+            {495, 500, 500, 500, 500, 500, 500, 495},
+            {495, 500, 500, 500, 500, 500, 500, 495},
+            {495, 500, 500, 500, 500, 500, 500, 495},
+            {495, 500, 500, 500, 500, 500, 500, 495},
+            {498, 500, 505, 505, 505, 505, 500, 498}
         },
-        { // 4 queen
-            {-20,-10,-10, -5, -5,-10,-10,-20},
-            {-10,  0,  0,  0,  0,  0,  0,-10},
-            {-10,  0,  5,  5,  5,  5,  0,-10},
-            { -5,  0,  5,  5,  5,  5,  0, -5},
-            {  0,  0,  5,  5,  5,  5,  0, -5},
-            {-10,  5,  5,  5,  5,  5,  0,-10},
-            {-10,  0,  5,  0,  0,  0,  0,-10},
-            {-20,-10,-10, -5, -5,-10,-10,-20}
+        { // 4 queen (900)
+            {880, 890, 890, 895, 895, 890, 890, 880},
+            {890, 900, 900, 900, 900, 900, 900, 890},
+            {890, 900, 905, 905, 905, 905, 900, 890},
+            {895, 900, 905, 905, 905, 905, 900, 895},
+            {895, 900, 905, 905, 905, 905, 900, 895},
+            {890, 900, 905, 905, 905, 905, 900, 890},
+            {890, 900, 900, 900, 900, 900, 900, 890},
+            {880, 890, 890, 895, 895, 890, 890, 880}
         },
-        { // 5 king
-            {-30,-40,-40,-50,-50,-40,-40,-30},
-            {-30,-40,-40,-50,-50,-40,-40,-30},
-            {-30,-40,-40,-50,-50,-40,-40,-30},
-            {-30,-40,-40,-50,-50,-40,-40,-30},
-            {-20,-30,-30,-40,-40,-30,-30,-20},
-            {-10,-20,-20,-20,-20,-20,-20,-10},
-            { 20, 20,  0,  0,  0,  0, 20, 20},
-            { 20, 30, 10,  0,  0, 10, 30, 20}
+        { // 5 king (10000)
+            { 9970,  9960,  9960,  9950,  9950,  9960,  9960,  9970},
+            { 9970,  9960,  9960,  9950,  9950,  9960,  9960,  9970},
+            { 9970,  9960,  9960,  9950,  9950,  9960,  9960,  9970},
+            { 9970,  9960,  9960,  9950,  9950,  9960,  9960,  9970},
+            { 9980,  9970,  9970,  9960,  9960,  9970,  9970,  9980},
+            { 9990,  9980,  9980,  9980,  9980,  9980,  9980,  9990},
+            {10010, 10010, 10000, 10000, 10000, 10000, 10010, 10010},
+            {10015, 10030, 10005, 10000, 10000, 10025, 10030, 10015} // intentionally assymetric. encourages castling 
         },
-        { // 6 king endgame
-            {-50,-40,-30,-20,-20,-30,-40,-50},
-            {-30,-20,-10,  0,  0,-10,-20,-30},
-            {-30,-10, 20, 30, 30, 20,-10,-30},
-            {-30,-10, 30, 40, 40, 30,-10,-30},
-            {-30,-10, 30, 40, 40, 30,-10,-30},
-            {-30,-10, 20, 30, 30, 20,-10,-30},
-            {-30,-30,  0,  0,  0,  0,-30,-30},
-            {-50,-30,-30,-30,-30,-30,-30,-50}
+        { // 6 king endgame (10000)
+            { 9950,  9960,  9970,  9980,  9980,  9970,  9960,  9950},
+            { 9970,  9980,  9990, 10000, 10000,  9990,  9980,  9970},
+            { 9970,  9990, 10020, 10030, 10030, 10020,  9990,  9970},
+            { 9970,  9990, 10030, 10040, 10040, 10030,  9990,  9970},
+            { 9970,  9990, 10030, 10040, 10040, 10030,  9990,  9970},
+            { 9970,  9990, 10020, 10030, 10030, 10020,  9990,  9970},
+            { 9970,  9970, 10000, 10000, 10000, 10000,  9970,  9970},
+            { 9950,  9970,  9970,  9970,  9970,  9970,  9970,  9950}
         }
     };
 
@@ -86,20 +86,25 @@ public class MyBot : IChessBot
     {
         Move[] allMoves = board.GetLegalMoves();
         Move moveToPlay = new Move();
-        int bestEvaluation = -99999;
+        int bestEvaluation = -999999; // MUST be lower than the evaluation returned by board.IsInCheckmate within search function. Otherwise computer in forced checkmate will return null
 
         foreach (Move move in allMoves)
         {
             board.MakeMove(move);
             int evaluation = -Search(board, 3, -99999999, 99999999); //hardcode 3 (2 per side plus one from previous line). this function is now recursive
+            board.UndoMove(move);
+            
+            Console.Write(move.ToString());
+            Console.Write("|");
+            Console.WriteLine(evaluation);
+            
             if (evaluation > bestEvaluation)
             {
                 bestEvaluation = evaluation;
                 moveToPlay = move;
             }
-            board.UndoMove(move);
         }
-
+        Console.WriteLine("--------------------");
         return moveToPlay;
     }
 
@@ -112,21 +117,17 @@ public class MyBot : IChessBot
             // reached the end of recursive loop, evaluate the position now
             return Evalute(board);
         }
-
-        Move[] allMoves = board.GetLegalMoves();
-
         if (board.IsInCheckmate())
         {
             return -99999; // Current Player is in checkmate. That's bad
         }
-
         if (board.IsDraw())
         {
             return 0; // game over, draw
         }
 
         // int bestEvaluation = -9999999;
-
+        Move[] allMoves = board.GetLegalMoves();
         // recursive loop from video
         foreach (Move move in allMoves)
         {
@@ -139,6 +140,15 @@ public class MyBot : IChessBot
                 // Move was too good, opponent will avoid this position
                 return beta; // snip this tree
             }
+            /*
+            if (evaluation > alpha)
+            {
+                Console.Write("\t|");
+                Console.Write(move.ToString());
+                Console.Write("|");
+                Console.WriteLine(evaluation);
+            }
+            */
             alpha = Math.Max(alpha, evaluation);
         }
         return alpha;
@@ -148,15 +158,14 @@ public class MyBot : IChessBot
     int Evalute(Board board)
     {
         PieceList[] arrayOfPieceLists = board.GetAllPieceLists();
-        int materialEvaluation = GetAllPiecesMaterialValue(arrayOfPieceLists);
         int positionEvaluation = GetAllPiecesPositionValue(arrayOfPieceLists);
         int perspective = (board.IsWhiteToMove) ? 1 : -1;
         // positive good for current player moving/being evaluted
 
-        return (materialEvaluation + positionEvaluation) * perspective;
+        return positionEvaluation * perspective;
     }
 
-
+    /* Integrated material values into GetAllPiecesPositionValue so this is no longer needed
     // Uses pieceValue array and arrayOfPieceLists to calculate total piece value for a specific player. There's probably an efficient way to slim this down but that's for later
     int GetAllPiecesMaterialValue(PieceList[] arrayOfPieceLists)
     {
@@ -176,11 +185,12 @@ public class MyBot : IChessBot
         }
         return total;
     }
+    */
 
     int GetAllPiecesPositionValue(PieceList[] pieceLists)
     {
         int total = 0;
-        int flip = 1;
+        bool whitePieces = true;
         bool isEndgame = false;
         int minorPieceCount = pieceLists[1].Count + pieceLists[2].Count + pieceLists[3].Count;
         if ((pieceLists[4].Count == 0 && pieceLists[10].Count == 0 && minorPieceCount <= 4) || (minorPieceCount <= 2))
@@ -188,19 +198,33 @@ public class MyBot : IChessBot
         {
             isEndgame = true;
         }
-        for (int i = 0; i < pieceLists.Length; i++)
+        for (int i = 0; i <= 11; i++)
         {
-            if(i >= 6)
+            if(i == 6)
             {
-                flip = -1; // flip values for black
+                whitePieces = false; // flip values for black for 6-11
             }
             foreach (Piece piece in pieceLists[i])
             {
-                if(i == 6 || i == 11 && isEndgame)
+                if((i == 5 || i == 11) && isEndgame)
                 {
-                    total += allPiecesBlackPositionValues[6, 7 - piece.Square.File, piece.Square.Rank] * flip;
+                    if (whitePieces) // white king during endgame
+                    {
+                        total += allPiecesBlackPositionValues[6, 7 - piece.Square.Rank, piece.Square.File]; // "7 minus File" not necessary since king endgame table is symmetric
+                    }
+                    else // black king during endgame
+                    {
+                        total -= allPiecesBlackPositionValues[6, piece.Square.Rank, piece.Square.File];
+                    }
                 }
-                total += allPiecesBlackPositionValues[i, 7 - piece.Square.File, piece.Square.Rank] * flip;
+                else if (whitePieces) // white pieces
+                {
+                    total += allPiecesBlackPositionValues[i, 7 - piece.Square.Rank, 7 - piece.Square.File]; // "7 minus File" to handle assymetric cases
+                }
+                else // black pieces
+                {
+                    total -= allPiecesBlackPositionValues[i % 6, piece.Square.Rank, piece.Square.File];
+                }
             }
         }
         return total;
