@@ -66,8 +66,8 @@ public class MyBot : IChessBot
             { 9970,  9960,  9960,  9950,  9950,  9960,  9960,  9970},
             { 9970,  9960,  9960,  9950,  9950,  9960,  9960,  9970},
             { 9980,  9970,  9970,  9960,  9960,  9970,  9970,  9980},
-            { 9990,  9980,  9980,  9980,  9980,  9980,  9980,  9990},
-            {10010, 10010, 10000, 10000, 10000, 10000, 10010, 10010},
+            { 9990,  9980,  9980,  9970,  9970,  9980,  9980,  9990},
+            {10000, 10000,  9980,  9970,  9970,  9980, 10000, 10000},
             {10015, 10030, 10005, 10000, 10000, 10025, 10030, 10015} // intentionally assymetric. encourages castling 
         },
         { // 6 king endgame (10000)
@@ -86,51 +86,91 @@ public class MyBot : IChessBot
     {
         Move[] allMoves = board.GetLegalMoves();
         Move moveToPlay = new Move();
-        int bestEvaluation = -999999; // MUST be lower than the evaluation returned by board.IsInCheckmate within search function. Otherwise computer in forced checkmate will return null
+        int alpha = int.MinValue; // Alpha is the minimum evaluation we can guarantee for the current player ("maximizing player")
+        int beta = int.MaxValue; // Beta is the maximum evaluation that we can guarantee fo the opponent ("minimizing player")
+        int evaluation = int.MinValue;
+        int bestEval = int.MinValue;
+        int depth = 3; // we can get rid of this variable in the future
 
         foreach (Move move in allMoves)
         {
             board.MakeMove(move);
-            int evaluation = -Search(board, 3, -99999999, 99999999); //hardcode 3 (2 per side plus one from previous line). this function is now recursive
+            evaluation = Math.Max(evaluation, Search(board, depth, alpha, beta, false)); //hardcode 3 (2 per side plus one from previous line). this function is now recursive
             board.UndoMove(move);
-            
+
+            /*
             Console.Write(move.ToString());
             Console.Write("|");
             Console.WriteLine(evaluation);
-            
-            if (evaluation > bestEvaluation)
+            */
+            if (evaluation > bestEval)
             {
-                bestEvaluation = evaluation;
+                bestEval = evaluation;
                 moveToPlay = move;
             }
         }
+
+        /*
+        Console.Write(moveToPlay.ToString());
+        Console.Write("|");
+        Console.WriteLine(alpha);
         Console.WriteLine("--------------------");
+        */
+
         return moveToPlay;
     }
 
-    int Search(Board board, int depth, int alpha, int beta)
+    int Search(Board board, int depth, int alpha, int beta, bool maximizingPlayer)
     {
-        // Alpha is the best choice for you we have found so far at any point along the path
-        // Beta is the best choice for the opponent we have found so far at any point along the path
         if (depth == 0)
         {
             // reached the end of recursive loop, evaluate the position now
-            return Evalute(board);
+            return Evaluate(board);
         }
         if (board.IsInCheckmate())
         {
-            return -99999; // Current Player is in checkmate. That's bad
+            return int.MinValue; // Current Player is in checkmate. That's bad
         }
         if (board.IsDraw())
         {
             return 0; // game over, draw
         }
 
-        // int bestEvaluation = -9999999;
         Move[] allMoves = board.GetLegalMoves();
-        // recursive loop from video
+
+        if (maximizingPlayer)
+        {
+            int evaluation = int.MinValue;
+            foreach (Move move in allMoves)
+            {
+                board.MakeMove(move);
+                evaluation = Math.Max(evaluation, Search(board, depth - 1, alpha, beta, false));
+                board.UndoMove(move);
+                if (evaluation > beta) break; // evaluation is too good for us, opponent wouldn't let us do that
+                alpha = Math.Max(alpha, evaluation);
+            }
+            return evaluation;
+        }
+
+        else // not maximizingPlayer
+        {
+            int evaluation = int.MaxValue;
+            foreach (Move move in allMoves)
+            {
+                board.MakeMove(move);
+                evaluation = Math.Min(evaluation, Search(board, depth - 1, alpha, beta, true));
+                board.UndoMove(move);
+                if (evaluation < alpha) break; // evaluation is too bad for the opponent, they wouldn't do that
+                beta = Math.Min(beta, evaluation);
+            }
+            return evaluation;
+        }
+        
+        
+        /* Clever code is bad code...
         foreach (Move move in allMoves)
         {
+            
             board.MakeMove(move);
             int evaluation = -Search(board, depth - 1, -beta, -alpha); //negative because we're now evaluating for opponent and what's good for them is bad for us, swapping beta/alpha 
             board.UndoMove(move);
@@ -138,9 +178,9 @@ public class MyBot : IChessBot
             if (evaluation >= beta)
             {
                 // Move was too good, opponent will avoid this position
-                return beta; // snip this tree
+                return evaluation; // snip this tree
             }
-            /*
+            
             if (evaluation > alpha)
             {
                 Console.Write("\t|");
@@ -148,14 +188,15 @@ public class MyBot : IChessBot
                 Console.Write("|");
                 Console.WriteLine(evaluation);
             }
-            */
+            
             alpha = Math.Max(alpha, evaluation);
         }
         return alpha;
+        */
     }
 
     // Main method for evaluating the "score" of a position.
-    int Evalute(Board board)
+    int Evaluate(Board board)
     {
         PieceList[] arrayOfPieceLists = board.GetAllPieceLists();
         int positionEvaluation = GetAllPiecesPositionValue(arrayOfPieceLists);
