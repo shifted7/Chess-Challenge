@@ -115,7 +115,7 @@ public class MyBot : IChessBot
         if (depth == 0)
         {
             // reached the end of recursive loop, evaluate the position now
-            return Evalute(board);
+            return Evaluate(board);
         }
         if (board.IsInCheckmate())
         {
@@ -155,7 +155,7 @@ public class MyBot : IChessBot
     }
 
     // Main method for evaluating the "score" of a position.
-    int Evalute(Board board)
+    public int Evaluate(Board board)
     {
         PieceList[] arrayOfPieceLists = board.GetAllPieceLists();
         int positionEvaluation = GetAllPiecesPositionValue(arrayOfPieceLists);
@@ -187,7 +187,7 @@ public class MyBot : IChessBot
     }
     */
 
-    int GetAllPiecesPositionValue(PieceList[] pieceLists)
+    public int GetAllPiecesPositionValue(PieceList[] pieceLists)
     {
         int total = 0;
         bool whitePieces = true;
