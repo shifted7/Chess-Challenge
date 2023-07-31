@@ -1,17 +1,15 @@
 ﻿using ChessChallenge.API;
 using System;
 
-namespace ChessChallenge.Example
+public class EvilBot : IChessBot
 {
-    public class EvilBot : IChessBot
-    {
-        // https://seblague.github.io/chess-coding-challenge/documentation/
-        // Documentation
+    // https://seblague.github.io/chess-coding-challenge/documentation/
+    // Documentation
 
-        // Piece values: pawn, knight, bishop, rook, queen, king
-        // int[] pieceValues = { 100, 320, 350, 500, 900, 10000 };
-        int[,,] allPiecesBlackPositionValues =
-        {
+    // Piece values: pawn, knight, bishop, rook, queen, king
+    // int[] pieceValues = { 100, 320, 350, 500, 900, 10000 };
+    int[,,] allPiecesBlackPositionValues =
+    {
         { // 0 pawn (100)
             {  0,   0,   0,   0,   0,   0,   0,   0}, //h1 to a1 when calculated for white
             {180, 180, 180, 180, 180, 180, 180, 180},
@@ -40,7 +38,7 @@ namespace ChessChallenge.Example
             {340, 350, 360, 360, 360, 360, 350, 340},
             {340, 360, 360, 360, 360, 360, 360, 340},
             {340, 360, 350, 350, 350, 350, 360, 340},
-            {330, 340, 340, 340, 340, 340, 340, 330}
+            {340, 340, 330, 330, 330, 330, 340, 340}
         },
         { // 3 rook (500)
             {500, 500, 500, 500, 500, 500, 500, 500},
@@ -84,210 +82,152 @@ namespace ChessChallenge.Example
         }
     };
 
-        public Move Think(Board board, Timer timer)
-        {
-            Move[] allMoves = board.GetLegalMoves();
-            Move moveToPlay = new Move();
-            int bestEvaluation = -999999; // MUST be lower than the evaluation returned by board.IsInCheckmate within search function. Otherwise computer in forced checkmate will return null
-
-            foreach (Move move in allMoves)
-            {
-                board.MakeMove(move);
-                int evaluation = -Search(board, 3, -99999999, 99999999); //hardcode 3 (2 per side plus one from previous line). this function is now recursive
-                board.UndoMove(move);
-                /*
-                Console.Write(move.ToString());
-                Console.Write("|");
-                Console.WriteLine(evaluation);
-                */
-                if (evaluation > bestEvaluation)
-                {
-                    bestEvaluation = evaluation;
-                    moveToPlay = move;
-                }
-            }
-            /*
-            Console.Write(moveToPlay.ToString());
-            Console.Write("|");
-            Console.WriteLine(bestEvaluation);
-            Console.WriteLine("--------------------");
-            */
-            return moveToPlay;
-        }
-
-        int Search(Board board, int depth, int alpha, int beta)
-        {
-            // Alpha is the best choice for you we have found so far at any point along the path
-            // Beta is the best choice for the opponent we have found so far at any point along the path
-            if (depth == 0)
-            {
-                // reached the end of recursive loop, evaluate the position now
-                return Evalute(board);
-            }
-            if (board.IsInCheckmate())
-            {
-                return -99999; // Current Player is in checkmate. That's bad
-            }
-            if (board.IsDraw())
-            {
-                return 0; // game over, draw
-            }
-
-            // int bestEvaluation = -9999999;
-            Move[] allMoves = board.GetLegalMoves();
-            // recursive loop from video
-            foreach (Move move in allMoves)
-            {
-                board.MakeMove(move);
-                int evaluation = -Search(board, depth - 1, -beta, -alpha); //negative because we're now evaluating for opponent and what's good for them is bad for us, swapping beta/alpha 
-                board.UndoMove(move);
-                //bestEvaluation = Math.Max(bestEvaluation, evaluation);
-                if (evaluation >= beta)
-                {
-                    // Move was too good, opponent will avoid this position
-                    return beta; // snip this tree
-                }
-                /*
-                if (evaluation > alpha)
-                {
-                    Console.Write("\t|");
-                    Console.Write(move.ToString());
-                    Console.Write("|");
-                    Console.WriteLine(evaluation);
-                }
-                */
-                alpha = Math.Max(alpha, evaluation);
-            }
-            return alpha;
-        }
-
-        // Main method for evaluating the "score" of a position.
-        int Evalute(Board board)
-        {
-            PieceList[] arrayOfPieceLists = board.GetAllPieceLists();
-            int positionEvaluation = GetAllPiecesPositionValue(arrayOfPieceLists);
-            int perspective = (board.IsWhiteToMove) ? 1 : -1;
-            // positive good for current player moving/being evaluted
-
-            return positionEvaluation * perspective;
-        }
-
-        /* Integrated material values into GetAllPiecesPositionValue so this is no longer needed
-        // Uses pieceValue array and arrayOfPieceLists to calculate total piece value for a specific player. There's probably an efficient way to slim this down but that's for later
-        int GetAllPiecesMaterialValue(PieceList[] arrayOfPieceLists)
-        {
-            int index = 0;
-            int total = 0;
-            int flip = 1;
-            // Loop to get total piece value count
-            // Pawns(white), Knights (white), Bishops (white), Rooks (white), Queens (white), King (white), Pawns (black), Knights (black), Bishops (black), Rooks (black), Queens (black), King (black).
-            foreach (PieceList listOfPiece in arrayOfPieceLists)
-            {
-                total += listOfPiece.Count * pieceValues[index % 6] * flip;
-                if (index == 5)
-                {
-                    flip = -1; // After pieces 0-5, we're using black PieceList
-                }
-                index++;
-            }
-            return total;
-        }
-        */
-
-        int GetAllPiecesPositionValue(PieceList[] pieceLists)
-        {
-            int total = 0;
-            bool whitePieces = true;
-            bool isEndgame = false;
-            int minorPieceCount = pieceLists[1].Count + pieceLists[2].Count + pieceLists[3].Count;
-            if ((pieceLists[4].Count == 0 && pieceLists[10].Count == 0 && minorPieceCount <= 4) || (minorPieceCount <= 2))
-            // Queens are off the board or two or fewer knight/bishop/rook, we're endgame now. Technically we could check black's pieces too but if the two players are mismatched by an entire minor piece, the game is probably over
-            {
-                isEndgame = true;
-            }
-            for (int i = 0; i <= 11; i++)
-            {
-                if (i == 6)
-                {
-                    whitePieces = false; // flip values for black for 6-11
-                }
-                foreach (Piece piece in pieceLists[i])
-                {
-                    if ((i == 5 || i == 11) && isEndgame)
-                    {
-                        if (whitePieces) // white king during endgame
-                        {
-                            total += allPiecesBlackPositionValues[6, 7 - piece.Square.Rank, piece.Square.File]; // "7 minus File" not necessary since king endgame table is symmetric
-                        }
-                        else // black king during endgame
-                        {
-                            total -= allPiecesBlackPositionValues[6, piece.Square.Rank, piece.Square.File];
-                        }
-                    }
-                    else if (whitePieces) // white pieces
-                    {
-                        total += allPiecesBlackPositionValues[i, 7 - piece.Square.Rank, 7 - piece.Square.File]; // "7 minus File" to handle assymetric cases
-                    }
-                    else // black pieces
-                    {
-                        total -= allPiecesBlackPositionValues[i % 6, piece.Square.Rank, piece.Square.File];
-                    }
-                }
-            }
-            return total;
-        }
-
-
-    }
-    /*
-    // A simple bot that can spot mate in one, and always captures the most valuable piece it can.
-    // Plays randomly otherwise.
-    public class EvilBot : IChessBot
+    public Move Think(Board board, Timer timer)
     {
-        // Piece values: null, pawn, knight, bishop, rook, queen, king
-        int[] pieceValues = { 0, 100, 300, 300, 500, 900, 10000 };
+        Move[] allMoves = board.GetLegalMoves();
+        Move moveToPlay = new Move();
+        int alpha = int.MinValue; // Alpha is the minimum evaluation we can guarantee for the current player ("maximizing player")
+        int beta = int.MaxValue; // Beta is the maximum evaluation that we can guarantee for the opponent ("minimizing player")
+        int evaluation = int.MinValue;
+        int bestEval = int.MinValue;
+        int depth = 3; // we can get rid of this variable in the future
 
-        public Move Think(Board board, Timer timer)
-        {
-            Move[] allMoves = board.GetLegalMoves();
-
-            // Pick a random move to play if nothing better is found
-            Random rng = new();
-            Move moveToPlay = allMoves[rng.Next(allMoves.Length)];
-            int highestValueCapture = 0;
-
-            foreach (Move move in allMoves)
-            {
-                // Always play checkmate in one
-                if (MoveIsCheckmate(board, move))
-                {
-                    moveToPlay = move;
-                    break;
-                }
-
-                // Find highest value capture
-                Piece capturedPiece = board.GetPiece(move.TargetSquare);
-                int capturedPieceValue = pieceValues[(int)capturedPiece.PieceType];
-
-                if (capturedPieceValue > highestValueCapture)
-                {
-                    moveToPlay = move;
-                    highestValueCapture = capturedPieceValue;
-                }
-            }
-
-            return moveToPlay;
-        }
-
-        // Test if this move gives checkmate
-        bool MoveIsCheckmate(Board board, Move move)
+        foreach (Move move in allMoves)
         {
             board.MakeMove(move);
-            bool isMate = board.IsInCheckmate();
+            evaluation = Search(board, depth, alpha, beta, false, 0); // this function is now recursive
             board.UndoMove(move);
-            return isMate;
+
+            /*
+            Console.Write(move.ToString());
+            Console.Write("|");
+            Console.WriteLine(evaluation);
+            */
+            if (evaluation > bestEval)
+            {
+                bestEval = evaluation;
+                moveToPlay = move;
+            }
+        }
+
+        /*
+        Console.Write(moveToPlay.ToString());
+        Console.Write("|");
+        Console.WriteLine(alpha);
+        Console.WriteLine("--------------------");
+        */
+
+        return moveToPlay;
+    }
+
+    int Search(Board board, int depth, int alpha, int beta, bool maximizingPlayer, int numExtensions)
+    {
+        if (depth == 0)
+        {
+            // reached the end of recursive loop, evaluate the position now
+            return Evaluate(board, maximizingPlayer);
+        }
+
+        Move[] allMoves = board.GetLegalMoves();
+        if (allMoves.Length == 0)
+        {
+            if (board.IsInCheck()) // checkmate
+            {
+                if (maximizingPlayer) // we will lose, that's bad
+                {
+                    return -999999; // don't set to int.MinValue or else forced checkmates return Null
+                }
+                return int.MaxValue; // opponent will lose, that's good
+            }
+            else
+            {
+                return 0; //stalemate
+            }
+        }
+
+        if (maximizingPlayer)
+        {
+            int evaluation = int.MinValue;
+            foreach (Move move in allMoves)
+            {
+                board.MakeMove(move);
+                int extension = (numExtensions < 2 && board.IsInCheck()) ? 2 : 0; // go one move deeper (2 ply) if we put opponent in check with max 2 extra
+                evaluation = Math.Max(evaluation, Search(board, depth - 1 + extension, alpha, beta, false, numExtensions + extension));
+                board.UndoMove(move);
+                if (evaluation > beta) break; // this move is better for the MinPlayer (opponent) than a previous branch's maximum possible (beta). Stop this tree
+                alpha = Math.Max(alpha, evaluation);
+            }
+            return evaluation;
+        }
+
+        else // not maximizingPlayer
+        {
+            int evaluation = int.MaxValue;
+            foreach (Move move in allMoves)
+            {
+                board.MakeMove(move);
+                evaluation = Math.Min(evaluation, Search(board, depth - 1, alpha, beta, true, numExtensions));
+                board.UndoMove(move);
+                if (evaluation < alpha) break; // this move is worse for the MaxPlayer (self) than a previous branch's minimum possible (alpha). Stop this tree
+                beta = Math.Min(beta, evaluation);
+            }
+            return evaluation;
         }
     }
-    */
-}
 
+    // Main method for evaluating the "score" of a position.
+    public int Evaluate(Board board, bool maximizingPlayer)
+    {
+        if (board.IsDraw()) return 0; // handles repetitions
+        PieceList[] arrayOfPieceLists = board.GetAllPieceLists();
+        int positionEvaluation = GetAllPiecesPositionValue(arrayOfPieceLists);
+        if ((maximizingPlayer && !board.IsWhiteToMove) || (!maximizingPlayer && board.IsWhiteToMove))
+        {
+            return -positionEvaluation; // we're playing black or we're evaluating for the white opponent
+        }
+        return positionEvaluation; // we're playing white or we're evaluating for the black opponent (double negative)
+    }
+
+    public int GetAllPiecesPositionValue(PieceList[] pieceLists)
+    {
+        int total = 0;
+        bool whitePieces = true;
+        bool isEndgame = false;
+        int minorPieceCount = pieceLists[1].Count + pieceLists[2].Count + pieceLists[3].Count;
+        if ((pieceLists[4].Count == 0 && pieceLists[10].Count == 0 && minorPieceCount <= 4) || (minorPieceCount <= 2))
+        // Queens are off the board or two or fewer knight/bishop/rook, we're endgame now. Technically we could check black's pieces too but if the two players are mismatched by an entire minor piece, the game is probably over
+        {
+            isEndgame = true;
+        }
+        for (int i = 0; i <= 11; i++)
+        {
+            if (i == 6)
+            {
+                whitePieces = false; // flip values for black for 6-11
+            }
+            foreach (Piece piece in pieceLists[i])
+            {
+                if ((i == 5 || i == 11) && isEndgame)
+                {
+                    if (whitePieces) // white king during endgame
+                    {
+                        total += allPiecesBlackPositionValues[6, 7 - piece.Square.Rank, piece.Square.File]; // "7 minus File" not necessary since king endgame table is symmetric
+                    }
+                    else // black king during endgame
+                    {
+                        total -= allPiecesBlackPositionValues[6, piece.Square.Rank, piece.Square.File];
+                    }
+                }
+                else if (whitePieces) // white pieces
+                {
+                    total += allPiecesBlackPositionValues[i, 7 - piece.Square.Rank, 7 - piece.Square.File]; // "7 minus File" to handle assymetric cases
+                }
+                else // black pieces
+                {
+                    total -= allPiecesBlackPositionValues[i % 6, piece.Square.Rank, piece.Square.File];
+                }
+            }
+        }
+        return total;
+    }
+}
