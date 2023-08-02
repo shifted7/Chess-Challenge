@@ -1,7 +1,5 @@
 ﻿using ChessChallenge.API;
 using System;
-using System.Linq;
-
 public class MyBot : IChessBot
 {
     // https://seblague.github.io/chess-coding-challenge/documentation/
